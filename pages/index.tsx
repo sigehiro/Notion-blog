@@ -1,26 +1,27 @@
 import { GetStaticProps } from "next";
 import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-
-import { getAllPosts } from '@/lib/notionAPI'
-import { title } from 'process';
+import Link from "next/link";
 import SinglePost from '@/components/Post/SinglePost'
+import { getAllPosts, getPostForTopPage } from '@/lib/notionAPI'
+
+// import Image from 'next/image'
+// import styles from '../styles/Home.module.css'
+// import { title } from 'process';
 
 export const getStaticProps: GetStaticProps = async () => {
-  const allPosts = await getAllPosts();
+  const fourPosts = await getPostForTopPage(4);
 
   return{
     props:{
-      allPosts,
+      fourPosts,
     },
     revalidate: 10,
   };
 };
 
 
-export default function Home({ allPosts }) {
-  console.log(allPosts);
+export default function Home({ fourPosts }) {
+  // console.log(allPosts);
   return (
     <div className="container h-full w-full mx-auto">
       <Head>
@@ -33,19 +34,23 @@ export default function Home({ allPosts }) {
         <h1 className="text-5xl font-medium text-center mb-16">
           Notion blog
         </h1>
-        {allPosts.map((post) => (
+        {fourPosts.map((post) => (
             // <div className="mx-4">
             //   {post.title}</div>
           <div className="mx-4">
             <SinglePost
-            title = {post.title}
-            description = {post.description}
-            date = {post.date}
-            tags = {post.tag}
-            slug = {post.slug}
+              title = {post.title}
+              description = {post.description}
+              date = {post.date}
+              tags = {post.tag}
+              slug = {post.slug}
+              isPaginationPage = {false}
             />
           </div>
         ))}
+        <Link href="/posts/page/1" className="mb-6 lg:w-1/2 mx-auto rounded-md px-5 block text-right">
+          ...もっとみる
+        </Link>
       </main>
     </div>
   );

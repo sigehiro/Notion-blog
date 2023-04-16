@@ -1,3 +1,4 @@
+import { NUMBER_OF_POSTS_PER_PAGE } from "@/components/constants/constants";
 import { Client } from"@notionhq/client";
 import { NotionToMarkdown  } from "notion-to-md";
 
@@ -20,6 +21,7 @@ export const getAllPosts = async () =>  {
     });
 };
 
+
 const getPageMetaData = (post) => {
     const getTags = (tags) => {
         const allTags = tags.map((tag) => {
@@ -37,6 +39,7 @@ const getPageMetaData = (post) => {
         slug: post.properties.Slug.rich_text[0].plain_text
     }
 };
+
 
 export const getSinglePost =async (slug) => {
     const response = await notion.databases.query({
@@ -65,3 +68,23 @@ export const getSinglePost =async (slug) => {
         markdown: mdString,
     };
 };
+
+
+//  Topページ用記事の取得（４つ）
+export const getPostForTopPage = async (pageSize = number) => {
+    const allPosts = await getAllPosts();
+    const fourPosts = allPosts.slice(0, pageSize);
+    return fourPosts;
+};
+
+
+// ページ番号に応じた記事取得
+export const getPostByPage =async (page:number) => {
+    const allPosts = await getAllPosts();
+
+    const startIndex  = (page - 1) * NUMBER_OF_POSTS_PER_PAGE; /* 1page中に表示したいページ数  */
+    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+
+    return allPosts.slice(startIndex, endIndex);
+    
+}
