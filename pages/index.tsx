@@ -49,4 +49,4 @@ export default function Home({ allPosts }) {
       </main>
     </div>
   );
-}
+};

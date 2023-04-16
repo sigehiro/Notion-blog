@@ -1,8 +1,11 @@
 import { Client } from"@notionhq/client";
+import { NotionToMarkdown  } from "notion-to-md";
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
   });
+
+const n2m = new NotionToMarkdown({ notionClient: notion});
 
 export const getAllPosts = async () =>  {
     const posts = await notion.databases.query({
@@ -33,4 +36,32 @@ const getPageMetaData = (post) => {
         date: post.properties.Date.date.start,
         slug: post.properties.Slug.rich_text[0].plain_text
     }
+};
+
+export const getSinglePost =async (slug) => {
+    const response = await notion.databases.query({
+        database_id: process.env.NOTION_DATABASE_ID,
+        filter: {
+            property: "Slug",
+            formula: {
+                string: {
+                    equals: slug,
+                },
+            },
+        },
+    });
+
+    const page  = response.results[0];
+    const metadata = getPageMetaData(page);
+    // console.log(metadata);
+
+    const mdblocks = await n2m.pageToMarkdown(page.id);
+    const mdString = n2m.toMarkdownString(mdblocks);
+    console.log(mdString)
+  
+
+    return{
+        metadata,
+        markdown: mdString,
+    };
 };
