@@ -42,7 +42,7 @@ export default function Home({ fourPosts }) {
               title = {post.title}
               description = {post.description}
               date = {post.date}
-              tags = {post.tag}
+              tags = {post.tags}
               slug = {post.slug}
               isPaginationPage = {false}
             />

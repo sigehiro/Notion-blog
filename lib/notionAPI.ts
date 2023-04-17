@@ -1,7 +1,7 @@
-import { NUMBER_OF_POSTS_PER_PAGE } from "@/components/constants/constants";
 import { Client } from"@notionhq/client";
-import { Console } from "console";
 import { NotionToMarkdown  } from "notion-to-md";
+import { NUMBER_OF_POSTS_PER_PAGE } from "@/components/constants/constants";
+import { Console } from "console";
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN,
@@ -12,7 +12,20 @@ const n2m = new NotionToMarkdown({ notionClient: notion});
 export const getAllPosts = async () =>  {
     const posts = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID,
-      page_size: 100,
+    //   page_size: 100,
+    //   filter: {
+    //     property: "Published",
+    //     checkbox: {
+    //       equals: true,
+    //     },
+    //   },
+    //   sorts: [
+    //     {
+    //       property: "Date",
+    //       direction: "descending",
+    //     },
+    //   ],
+    // });
     });
 
     const allPosts = posts.results;
@@ -33,7 +46,7 @@ const getPageMetaData = (post) => {
 
     return{
         id:post.id,
-        tag: getTags(post.properties.Tags.multi_select),
+        tags: getTags(post.properties.Tags.multi_select),
         title: post.properties.Name.title[0].plain_text,
         description: post.properties.Description.rich_text[0].plain_text,
         date: post.properties.Date.date.start,
@@ -72,7 +85,7 @@ export const getSinglePost =async (slug) => {
 
 
 //  Topページ用記事の取得（４つ）
-export const getPostForTopPage = async (pageSize = number) => {
+export const getPostForTopPage = async (pageSize : number) => {
     const allPosts = await getAllPosts();
     const fourPosts = allPosts.slice(0, pageSize);
     return fourPosts;
@@ -91,7 +104,7 @@ export const getPostByPage =async (page:number) => {
 }
 
 
-// 動的にURLにページ数を連動させる
+// 動的にURLにページ数を連動させる。すべての記事に対するページ数
 export const getNumberOfPages = async () => {
     const allPosts = await getAllPosts();
     // console.log(Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE));
@@ -100,4 +113,17 @@ export const getNumberOfPages = async () => {
         Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE) +
         (allPosts.length % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1: 0 )
      );
+};
+
+// #タグの種類によって、画面を表示させる
+export const getPostsByTagAndPage = async (tagName: string, page: number) => {
+    const allPosts = await getAllPosts();
+    const posts = allPosts.filter((post) =>
+      post.tags.find((tag: string) => tag === tagName)
+    );
+    const startIndex  = (page - 1) * NUMBER_OF_POSTS_PER_PAGE; /* 1page中に表示したいページ数  */
+    const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+
+    return posts.slice(startIndex, endIndex);
+
 };
