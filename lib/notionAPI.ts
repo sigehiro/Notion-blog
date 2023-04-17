@@ -1,5 +1,6 @@
 import { NUMBER_OF_POSTS_PER_PAGE } from "@/components/constants/constants";
 import { Client } from"@notionhq/client";
+import { Console } from "console";
 import { NotionToMarkdown  } from "notion-to-md";
 
 const notion = new Client({
@@ -88,3 +89,15 @@ export const getPostByPage =async (page:number) => {
     return allPosts.slice(startIndex, endIndex);
     
 }
+
+
+// 動的にURLにページ数を連動させる
+export const getNumberOfPages = async () => {
+    const allPosts = await getAllPosts();
+    // console.log(Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE));
+
+    return (
+        Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE) +
+        (allPosts.length % NUMBER_OF_POSTS_PER_PAGE > 0 ? 1: 0 )
+     );
+};

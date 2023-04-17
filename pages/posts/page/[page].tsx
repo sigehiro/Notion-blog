@@ -1,12 +1,22 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from 'next/head'
 import SinglePost from '../../../components/Post/SinglePost'
-import { getAllPosts, getPostByPage, getPostForTopPage } from '../../../lib/notionAPI'
+import { getAllPosts, getNumberOfPages, getPostByPage, getPostForTopPage,  } from '../../../lib/notionAPI';
+import Pagination from "@/components/Pagination/pagination";
 // import { getStaticPaths } from '../[slug]';
 
 export const getStaticPaths: GetStaticPaths = async () => {
+    const numberOfPage = await getNumberOfPages();
+
+    let params = [];
+    for(let i = 1; i <+ numberOfPage; i++){
+        params.push({ params:{ page:i.toString()} });
+    }
+
     return {
-        paths: [{ params: { page: "1"} }, { params: {page: "2 "} }],
+        paths: params,
+        // paths: 
+        // [{ params: { page: "1"} }, { params: {page: "2 "} }],
         fallback:"blocking",
     };
 };
@@ -16,17 +26,20 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const postsByPage = await getPostByPage(
         parseInt(currentPage.toString(), 10)
     );
+    const numberOfPage = await getNumberOfPages();
+
 
   return{
     props:{
         postsByPage,
+        numberOfPage,
     },
     revalidate: 10,
   };
 };
 
 
-const BlogPageList = ({ postsByPage }) => {
+const BlogPageList = ({ postsByPage, numberOfPage }) => {
   return (
     <div className="container h-full w-full mx-auto">
       <Head>
@@ -41,7 +54,7 @@ const BlogPageList = ({ postsByPage }) => {
         </h1>
         <section className="sm:grid grid-cols-2 w-5/6 gap-3 mx-auto">
             {postsByPage.map((post) => (
-            <div >
+            <div key={post.id}>
                 <SinglePost
                     title = {post.title}
                     description = {post.description}
@@ -53,6 +66,8 @@ const BlogPageList = ({ postsByPage }) => {
             </div>
             ))}
         </section>
+        {/* <Pagination /> */}
+        <Pagination numberOfPage={numberOfPage}/>
       </main>
     </div>
   );
