@@ -1,9 +1,11 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from 'next/head'
 import SinglePost from '../../../../../components/Post/SinglePost'
-import Pagination from "../../../../../components/Pagination/pagination"
+import Pagination from "../../../../../components/Pagination/Pagination"
 import { getAllPosts, 
+  getAllTags, 
 getNumberOfPages,
+getNumberOfPagesByTag,
 getPostByPage,
 getPostForTopPage,
 getPostsByTagAndPage,
@@ -11,17 +13,22 @@ getPostsByTagAndPage,
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    // const numberOfPage = await getNumberOfPages();
+  const allTags = await getAllTags();
+  let params = [];
 
-    // let params = [];
-    // for(let i = 1; i <+ numberOfPage; i++){
-    //     params.push({ params:{ page:i.toString()} });
-    // }
+  await Promise.all(
+    allTags.map((tag) => {
+      return getNumberOfPagesByTag(tag).then((numberOfPagesByTag: number) => {
+        for (let i = 1; i <+ numberOfPagesByTag; i++){
+            params.push({ params:{ tag: tag, page:i.toString()} });
+        }
+      });
+    })
+  );
+
 
     return {
-        // paths: params,
-        paths: 
-        [{ params: { tag: "blog" , page: "1"} }],
+        paths: params,
         fallback:"blocking",
     };
 };
@@ -38,16 +45,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
         parseInt(currentPage, 10)
     );
 
+const numberOfPagesByTag = await getNumberOfPagesByTag(upperCaseCurrentTag);
+
   return{
     props:{
       posts,
+      numberOfPagesByTag
     },
     revalidate: 10,
   };
 };
 
 
-const BlogTagPageList = ({ numberOfPage, posts }) => {
+const BlogTagPageList = ({ numberOfPagesByTag, posts }) => {
   return (
     <div className="container h-full w-full mx-auto">
       <Head>
@@ -75,7 +85,7 @@ const BlogTagPageList = ({ numberOfPage, posts }) => {
             ))}
         </section>
         {/* <Pagination /> */}
-        <Pagination numberOfPage={numberOfPage}/>
+        <Pagination numberOfPage={numberOfPagesByTag}/>
       </main>
     </div>
   );

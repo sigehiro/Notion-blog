@@ -2,7 +2,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from 'next/head'
 import SinglePost from '../../../components/Post/SinglePost'
 import { getAllPosts, getNumberOfPages, getPostByPage, getPostForTopPage,  } from '../../../lib/notionAPI';
-import Pagination from "@/components/Pagination/pagination";
+import Pagination from "@/components/Pagination/Pagination";
 // import { getStaticPaths } from '../[slug]';
 
 export const getStaticPaths: GetStaticPaths = async () => {
