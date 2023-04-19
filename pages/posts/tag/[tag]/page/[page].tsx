@@ -10,6 +10,7 @@ getPostByPage,
 getPostForTopPage,
 getPostsByTagAndPage,
 } from '../../../../../lib/notionAPI';
+import Tag from "@/components/Tag/Tag";
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -47,17 +48,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 const numberOfPagesByTag = await getNumberOfPagesByTag(upperCaseCurrentTag);
 
+const AllTags = await getAllTags();
+
   return{
     props:{
       posts,
-      numberOfPagesByTag
+      numberOfPagesByTag,
+      currentTag,
+      AllTags
     },
     revalidate: 10,
   };
 };
 
 
-const BlogTagPageList = ({ numberOfPagesByTag, posts }) => {
+const BlogTagPageList = ({ numberOfPagesByTag, posts , currentTag, AllTags}) => {
   return (
     <div className="container h-full w-full mx-auto">
       <Head>
@@ -85,7 +90,8 @@ const BlogTagPageList = ({ numberOfPagesByTag, posts }) => {
             ))}
         </section>
         {/* <Pagination /> */}
-        <Pagination numberOfPage={numberOfPagesByTag}/>
+        <Pagination numberOfPage={numberOfPagesByTag} tag = {currentTag} />
+        <Tag tags={AllTags}/>
       </main>
     </div>
   );

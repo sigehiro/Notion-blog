@@ -12,20 +12,21 @@ const n2m = new NotionToMarkdown({ notionClient: notion});
 export const getAllPosts = async () =>  {
     const posts = await notion.databases.query({
       database_id: process.env.NOTION_DATABASE_ID,
-    //   page_size: 100,
-    //   filter: {
-    //     property: "Published",
-    //     checkbox: {
-    //       equals: true,
-    //     },
-    //   },
-    //   sorts: [
-    //     {
-    //       property: "Date",
-    //       direction: "descending",
-    //     },
-    //   ],
-    // });
+    // ブログの公開・非公開
+      page_size: 100,
+      filter: {
+        property: "Published",
+        checkbox: {
+          equals: true,
+        },
+      },
+    // 日付の新しい順に並べる
+      sorts: [
+        {
+          property: "Date",
+          direction: "descending",
+        },
+      ],
     });
 
     const allPosts = posts.results;

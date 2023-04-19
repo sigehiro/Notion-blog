@@ -49,7 +49,9 @@ const Post = ({post}) => {
         <br />
         {post.metadata.tags.map((tag: string,  index: number) => (
           <p className='text-white bg-sky-900 rounded-xl font-medium mt-2 px-2 inline-block mr-2' key={index}>
-            {tag}
+            <Link href={`/posts/tag/${tag}/page/1 `}>
+              {tag}
+            </Link>
           </p>
         ))}
         <div className='mt-10 font-medium'>
