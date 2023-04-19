@@ -61,11 +61,12 @@ const Post = ({post}) => {
                     const match = /language-(\w+)/.exec(className || '')
                     return !inline && match ? (
                         <SyntaxHighlighter
-                            children={String(children).replace(/\n$/, '')}
                             style={vscDarkPlus}  /* dark以外にもvsDarkPlus,docco,あるかもしれないcode の背景を変えれる。*/
                             language={match[1]}
                             PreTag="div"
-                            />
+                            >
+                            {String(children).replace(/\n$/, '')}
+                            </SyntaxHighlighter>
                     ) : (
                         <code>
                             {children}
